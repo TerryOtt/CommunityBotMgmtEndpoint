@@ -13,7 +13,7 @@ $ sudo pip3 install tornado
 ### Obtain new
 
 Reference:
-(Letsencrypt)[https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-16-04]
+[Letsencrypt](https://www.digitalocean.com/community/tutorials/how-to-secure-apache-with-let-s-encrypt-on-ubuntu-16-04).
 
 ```
 $ sudo add-apt-repository ppa:certbot/certbot
