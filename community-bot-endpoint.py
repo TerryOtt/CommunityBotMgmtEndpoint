@@ -3,13 +3,17 @@ import tornado.web
 import os
 import tornado.tcpserver
 import ssl
+import logging
+import subprocess
 
 
 if 'COMMUNITYBOT_MGMT_ENDPOINT_ENDPOINT_VALIDATION_KEY' not in os.environ:
-    print( "FATAL: validation key env var not set")
+    logging.fatal( "Validation key env var not set")
     sys.exit( 1 )
 
 validation_key = os.environ['COMMUNITYBOT_MGMT_ENDPOINT_ENDPOINT_VALIDATION_KEY']
+
+communitybot_supervisorctl_name = "communitybot-discord"
 
 
 class CommunityBotHandler(tornado.web.RequestHandler):
@@ -22,7 +26,7 @@ class CommunityBotHandler(tornado.web.RequestHandler):
         }
 
         if operation in valid_operations:
-            print( "Valid operation requested: {0}".format(operation) )
+            logging.info( "Valid operation requested: {0}".format(operation) )
 
             if operation_validation_key == validation_key:
                 # Invoke "function pointer"
@@ -50,26 +54,32 @@ class CommunityBotHandler(tornado.web.RequestHandler):
 
 
     def _doStart(self):
-        print( "Requested operation \"start\" initiated" )
+        logging.info( "Requested operation \"start\" initiated" )
+        subprocess.run( [ "supervisorctl", "start", communitybot_supervisorctl_name ] )
 
 
     def _doStop(self):
-        print( "Requested operation \"stop\" initiated" )
+        logging.info( "Requested operation \"stop\" initiated" )
+        subprocess.run( [ "supervisorctl", "stop", communitybot_supervisorctl_name ] )
 
 
     def _doRestart(self):
-        print( "Requested operation \"restart\" initiated" )
+        logging.info( "Requested operation \"restart\" initiated" )
+        subprocess.run( [ "supervisorctl", "restart", communitybot_supervisorctl_name ] )
 
 
     def _doUpdate(self):
-        print( "Requested operation \"update\" initiated" )
+        logging.info( "Requested operation \"update\" initiated" )
+
+
 
 
 def _make_app():
     return tornado.web.Application(
         [
             (r"^\/bot\/(.*?)\/(.*?)\s*$", CommunityBotHandler),
-        ]
+        ],
+        debug=True
     )
 
 
@@ -80,13 +90,13 @@ def _make_ssl_ctx():
             'COMMUNITYBOT_MGMT_ENDPOINT_KEYFILE' not in os.environ or                       \
             os.path.isfile( os.environ['COMMUNITYBOT_MGMT_ENDPOINT_KEYFILE'] ) is False:
 
-        print( "FATAL: certificate file or key file not specified as env vars or don't exist on disk")
+        logging.fatal( "Certificate file or key file not specified as env vars or don't exist on disk")
         sys.exit( 1 )
 
     crt_file = os.environ['COMMUNITYBOT_MGMT_ENDPOINT_CRTFILE']
     key_file = os.environ['COMMUNITYBOT_MGMT_ENDPOINT_KEYFILE']
 
-    print( "TLS certificate and chain: {0}\n     TLS private key file: {1}".format(crt_file, key_file) )
+    logging.info( "TLS certificate and chain: {0}\n     TLS private key file: {1}".format(crt_file, key_file) )
 
     ssl_ctx.load_cert_chain( crt_file, key_file ) 
 
@@ -94,16 +104,17 @@ def _make_ssl_ctx():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
     application = _make_app()
     ssl_ctx = _make_ssl_ctx()
 
     http_server = tornado.httpserver.HTTPServer( application, ssl_options=ssl_ctx )
 
-    server_port = int( os.environ.get( 'COMMUNITYBOT_MGMT_ENDPOINT_PORT', 4443 ) )
+    server_port = int( os.environ.get( 'COMMUNITYBOT_MGMT_ENDPOINT_PORT', 443 ) )
 
     http_server.listen( server_port )
 
-    print( "Listening on port {0}".format(server_port) )
+    logging.info( "Listening for HTTPS connections on port {0}".format(server_port) )
 
     tornado.ioloop.IOLoop.current().start()
 
