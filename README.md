@@ -58,3 +58,14 @@ This directory contains your keys and certificates.
   COMMUNITYBOT_MGMT_ENDPOINT_PORT=443                           \       
   python3 community-bot-endpoint.py
 ```
+
+## Automated Run
+
+`/etc/supervisor/conf.d/communitybot-mgmt-endpoint.conf`
+
+```
+$ sudo supervisorctl start   communitybot-mgmt-endpoint
+$ sudo supervisorctl stop    communitybot-mgmt-endpoint
+$ sudo supervisorctl restart communitybot-mgmt-endpoint
+```
+
