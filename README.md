@@ -56,6 +56,6 @@ require root level permissions for the server
 # COMMUNITYBOT_MGMT_ENDPOINT_CRTFILE=/path/to/fullchain.pem		\
   COMMUNITYBOT_MGMT_ENDPOINT_KEYFILE=/path/to/privkey.pem 		\
   COMMUNITYBOT_MGMT_ENDPOINT_ENDPOINT_VALIDATION_KEY=abcd	    \
-  COMMUNITYBOT_MGMT_ENDPOINT_PORT=443                           \       
+  COMMUNITYBOT_MGMT_ENDPOINT_PORT=4443                          \       
   python3 community-bot-endpoint.py
 ```

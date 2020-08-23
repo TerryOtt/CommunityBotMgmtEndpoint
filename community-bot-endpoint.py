@@ -2,13 +2,67 @@ import tornado.ioloop
 import tornado.web
 import os
 import tornado.tcpserver
-import pathlib
 import ssl
+
+
+if 'COMMUNITYBOT_MGMT_ENDPOINT_ENDPOINT_VALIDATION_KEY' not in os.environ:
+    print( "FATAL: validation key env var not set")
+    sys.exit( 1 )
+
+validation_key = os.environ['COMMUNITYBOT_MGMT_ENDPOINT_ENDPOINT_VALIDATION_KEY']
 
 
 class CommunityBotHandler(tornado.web.RequestHandler):
     def get( self, operation, operation_validation_key ):
-        self.write("Endpoint: {0}, Endpoint key: {1}".format(operation, operation_validation_key) )
+        valid_operations = {
+            'start'     : self._doStart,
+            'stop'      : self._doStop,
+            'restart'   : self._doRestart,
+            'update'    : self._doUpdate 
+        }
+
+        if operation in valid_operations:
+            print( "Valid operation requested: {0}".format(operation) )
+
+            if operation_validation_key == validation_key:
+                # Invoke "function pointer"
+                valid_operations[ operation ]()
+                self.write( { "result": "success" } )
+            else:
+                error_string = "Incorrect validation key \"{0}\"".format(operation_validation_key)
+                self.set_status( 403, error_string )
+                self.write( 
+                    { 
+                        "status"        : "error", 
+                        "error_info"    : error_string
+                    }
+                )
+        else:
+            error_string = "Invalid operation requested: \"{0}\"".format( operation )
+            self.set_status( 404, error_string )
+            self.write(
+                {
+                    "status"        : "error",
+                    "error_info"    : error_string
+                }
+            )
+
+
+
+    def _doStart(self):
+        print( "Requested operation \"start\" initiated" )
+
+
+    def _doStop(self):
+        print( "Requested operation \"stop\" initiated" )
+
+
+    def _doRestart(self):
+        print( "Requested operation \"restart\" initiated" )
+
+
+    def _doUpdate(self):
+        print( "Requested operation \"update\" initiated" )
 
 
 def _make_app():
@@ -26,7 +80,7 @@ def _make_ssl_ctx():
             'COMMUNITYBOT_MGMT_ENDPOINT_KEYFILE' not in os.environ or                       \
             os.path.isfile( os.environ['COMMUNITYBOT_MGMT_ENDPOINT_KEYFILE'] ) is False:
 
-        print( "No keyfile at {0}".format(os.environ['COMMUNITYBOT_MGMT_ENDPOINT_KEYFILE']) )
+        print( "FATAL: certificate file or key file not specified as env vars or don't exist on disk")
         sys.exit( 1 )
 
     crt_file = os.environ['COMMUNITYBOT_MGMT_ENDPOINT_CRTFILE']
