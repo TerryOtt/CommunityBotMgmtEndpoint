@@ -52,9 +52,9 @@ This directory contains your keys and certificates.
 *Note*: MUST be run as **root**
 
 ```
-# COMMUNITYBOT_MGMT_ENDPOINT_CRTFILE=/path/to/fullchain.pem		\
-  COMMUNITYBOT_MGMT_ENDPOINT_KEYFILE=/path/to/privkey.pem 		\
-  COMMUNITYBOT_MGMT_ENDPOINT_ENDPOINT_VALIDATION_KEY=abcd	    \
-  COMMUNITYBOT_MGMT_ENDPOINT_PORT=4443                          \       
+# COMMUNITYBOT_MGMT_ENDPOINT_CRTFILE=/path/to/fullchain.pem     \
+  COMMUNITYBOT_MGMT_ENDPOINT_KEYFILE=/path/to/privkey.pem       \ 
+  COMMUNITYBOT_MGMT_ENDPOINT_ENDPOINT_VALIDATION_KEY=abcd       \
+  COMMUNITYBOT_MGMT_ENDPOINT_PORT=443                           \       
   python3 community-bot-endpoint.py
 ```
