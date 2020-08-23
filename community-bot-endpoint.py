@@ -52,6 +52,8 @@ class CommunityBotHandler(tornado.web.RequestHandler):
             )
 
 
+    # All operations taken from CommunityBot documentation:
+    #       https://wazeopedia.waze.com/wiki/USA/CommunityBot/BuildRun
 
     def _doStart(self):
         logging.info( "Requested operation \"start\" initiated" )
@@ -71,7 +73,32 @@ class CommunityBotHandler(tornado.web.RequestHandler):
     def _doUpdate(self):
         logging.info( "Requested operation \"update\" initiated" )
 
+        # Change current directory
+        bot_codedir = '/home/communitybot/CommunityBot'
+        os.chdir( bot_codedir )
 
+        # Show current directory
+        curr_dir = os.getcwd()
+        print( "current dir: {0}".format(curr_dir) )
+
+        if curr_dir != bot_codedir:
+            logging.error( "Not in proper dir for update even after change, bailing" )
+            return
+            
+        # stop the bot
+        self._doStop()
+        
+        # Download new code with git *as communitybot user*
+        subprocess.run( [ "su", "-c git pull", "communitybot" ] )
+
+        # Build new code *as community bot*
+        subprocess.run( [ "su", "-c dotnet build -c Release", "communitybot" ] ) 
+
+        # Publish the code *as communitybot*
+        subprocess.run( [ "su", "-c dotnet publish -c Release", "communitybot" ] )
+
+        # Start the bot
+        self._doStart()
 
 
 def _make_app():
