@@ -47,10 +47,9 @@ This directory contains your keys and certificates.
 ## Run
 
 
-*Note*: `COMMUNITY_BOT_MGMT_ENDPOINT_PORT` is optional and defaults to port 4443 
+*Note*: `COMMUNITY_BOT_MGMT_ENDPOINT_PORT` is optional and defaults to port 443 
 
-*Note*: Should not be run on any port below 1024 (aka "well known ports") as that will
-require root level permissions for the server
+*Note*: MUST be run as **root**
 
 ```
 # COMMUNITYBOT_MGMT_ENDPOINT_CRTFILE=/path/to/fullchain.pem		\
