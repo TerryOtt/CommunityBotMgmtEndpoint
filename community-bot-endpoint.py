@@ -17,6 +17,19 @@ communitybot_supervisorctl_name = "communitybot-discord"
 
 
 class CommunityBotHandler(tornado.web.RequestHandler):
+
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin",      "*")
+        self.set_header("Access-Control-Allow-Headers",     "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods',     "GET, OPTIONS")
+
+
+    def options(self):
+        # no body
+        self.set_status(204)
+        self.finish()
+
+
     def get( self, operation, operation_validation_key ):
         valid_operations = {
             'start'     : self._doStart,
@@ -144,4 +157,3 @@ if __name__ == "__main__":
     logging.info( "Listening for HTTPS connections on port {0}".format(server_port) )
 
     tornado.ioloop.IOLoop.current().start()
-
