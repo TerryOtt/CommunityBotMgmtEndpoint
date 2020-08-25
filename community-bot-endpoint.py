@@ -138,6 +138,15 @@ def _make_ssl_ctx():
 
     logging.info( "TLS certificate and chain: {0}\n     TLS private key file: {1}".format(crt_file, key_file) )
 
+    # Set minimum TLS version to 1.2 to improve SSL Labs SSL score
+
+    # Cannot use minimum_version as Ubuntu 16.04 has OpenSSL < 1.1.0 installed
+    #ssl_ctx.minimum_version = ssl.TLSVersion.TLSv1_2
+
+    # Using recommended doc example from https://docs.python.org/3/library/ssl.html#protocol-versions
+    ssl_ctx.options |= ssl.OP_NO_TLSv1
+    ssl_ctx.options |= ssl.OP_NO_TLSv1_1
+
     ssl_ctx.load_cert_chain( crt_file, key_file ) 
 
     return ssl_ctx
